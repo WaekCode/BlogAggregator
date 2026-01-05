@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/WaekCode/BlogAggregator/internal/config"
 	"fmt"
 
+	"os"
 
+	"github.com/WaekCode/BlogAggregator/internal/config"
 )	
 
 
@@ -15,13 +16,32 @@ func main() {
 		fmt.Println(er)
 	}
 
-	c.SetUser("Weak")
-
-	c2,er2 := config.Read()
-	if er2 != nil{
-		fmt.Println(er2)
+	state := &State{
+		Config: &c,
 	}
 
-	fmt.Println(c2)
+	commands := Commands{
+		c:  make(map[string]func(*State, Command) error) ,
+	}
+
+	commands.register("login",HandlerLogin)
+	userInput := os.Args[1:]
+	
+
+	if len(os.Args) <= 2{
+		fmt.Println("Less then two arguments..")
+		os.Exit(1)
+	}
+
+	command := Command{
+		Name: userInput[0],
+		Args: userInput[1:],
+	}
+
+	err := commands.run(state,command)
+	if err != nil{
+		fmt.Println(err)
+	}
+
 
 }
