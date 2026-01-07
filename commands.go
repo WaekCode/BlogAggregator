@@ -117,7 +117,7 @@ func HandlerRegister(s *State, cmd Command) error{
 	}
 
 	fmt.Println("user was created")
-	fmt.Println("current user:",s.Config.CurrentUserName)
+	fmt.Println("current user:",user.Name)
 	
 	fmt.Println(user)
 	return nil
@@ -136,6 +136,31 @@ func HandlerReset(s *State, cmd Command) error{
 	fmt.Println("Users were Not deleted")
 	return err
 
+}
 
 
+func HandlerUsers(s *State, cmd Command) error{
+	users,err := s.db.ListUsers(context.Background())
+	if err != nil{
+		fmt.Println("Could not list users")
+		return err
+	}
+
+
+	for _,name := range users{
+		f := name
+		if name == s.Config.CurrentUserName{
+			f += " (current)"
+			fmt.Println("*",f)
+
+			}else{
+			f := name
+			fmt.Println("*",f)
+		
+		}
+
+		
+	}
+
+	return nil
 }

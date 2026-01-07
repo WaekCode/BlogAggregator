@@ -27,6 +27,7 @@ func main() {
 		fmt.Println(errr)
 		os.Exit(1)
 	}
+	defer db.Close()
 
 	dbQueries := database.New(db)
 
@@ -44,10 +45,11 @@ func main() {
 	commands.register("login",HandlerLogin)
 	commands.register("register",HandlerRegister)
 	commands.register("reset",HandlerReset)
+	commands.register("users",HandlerUsers)
 
 
 	userInput := os.Args[1:]
-	if len(os.Args) <= 2 && userInput[0] != "reset"{
+	if len(os.Args) < 2 {
 		fmt.Println("Less then two arguments..")
 		os.Exit(1)
 	}
