@@ -123,3 +123,19 @@ func HandlerRegister(s *State, cmd Command) error{
 	return nil
 
 }
+
+
+func HandlerReset(s *State, cmd Command) error{
+	
+	err := s.db.ResetUsers(context.Background())
+	if err == nil{
+		fmt.Println("Users were deleted...")
+		return err
+	}
+
+	fmt.Println("Users were Not deleted")
+	return err
+
+
+
+}

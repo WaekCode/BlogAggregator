@@ -42,12 +42,12 @@ func main() {
 	}
 
 	commands.register("login",HandlerLogin)
-
 	commands.register("register",HandlerRegister)
+	commands.register("reset",HandlerReset)
 
 
 	userInput := os.Args[1:]
-	if len(os.Args) <= 2{
+	if len(os.Args) <= 2 && userInput[0] != "reset"{
 		fmt.Println("Less then two arguments..")
 		os.Exit(1)
 	}
@@ -60,7 +60,7 @@ func main() {
 	err := commands.run(state,command)
 	if err != nil{
 		fmt.Println(err)
-		os.Exit(1)
+
 	}
 
 
