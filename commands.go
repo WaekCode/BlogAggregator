@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -52,6 +51,10 @@ func (c *Commands) run(s *State, cmd Command) error {
 
 
 func HandlerLogin(s *State, cmd Command) error{
+	if len(cmd.Args) != 1{
+		fmt.Println("no arg was passed")
+		os.Exit(1)
+	}
 	
 	_, errs := s.db.GetUserByName(context.Background(), cmd.Args[0])
 	if errs != nil{
@@ -60,11 +63,7 @@ func HandlerLogin(s *State, cmd Command) error{
 	}
 
 
-	if len(cmd.Args) == 0{
-		return  errors.New("The login handler expects a single argument, the username.")
-		
-	}
-	
+
 	username := cmd.Args[0]
 
 
@@ -81,9 +80,10 @@ func HandlerLogin(s *State, cmd Command) error{
 
 
 func HandlerRegister(s *State, cmd Command) error{
-	if len(cmd.Args) == 0{
-		return  fmt.Errorf("No name was passed...")
-	}	
+	if len(cmd.Args) != 1{
+		fmt.Println("no arg was passed")
+		os.Exit(1)
+	}
 
 	_, errs := s.db.GetUserByName(context.Background(), cmd.Args[0])
 	if errs == nil{
@@ -146,6 +146,11 @@ func HandlerUsers(s *State, cmd Command) error{
 		return err
 	}
 
+	if len(users) == 0{
+		fmt.Println("No users found")
+		return nil
+	}
+
 
 	for _,name := range users{
 		f := name
@@ -163,4 +168,18 @@ func HandlerUsers(s *State, cmd Command) error{
 	}
 
 	return nil
+}
+
+
+func HandlerAgg(s *State, cmd Command) error{
+
+	rss,err := fetchFeed(context.Background(),"https://www.wagslane.dev/index.xml")
+	if err != nil{
+		return  err
+	}
+
+	fmt.Println(rss)
+	
+	return nil
+
 }

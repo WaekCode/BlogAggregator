@@ -3,12 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
-
 	"os"
-
 	"github.com/WaekCode/BlogAggregator/internal/config"
 	"github.com/WaekCode/BlogAggregator/internal/database"
-
 	_ "github.com/lib/pq"
 )	
 
@@ -46,17 +43,20 @@ func main() {
 	commands.register("register",HandlerRegister)
 	commands.register("reset",HandlerReset)
 	commands.register("users",HandlerUsers)
+	commands.register("agg",HandlerAgg)
 
 
-	userInput := os.Args[1:]
 	if len(os.Args) < 2 {
 		fmt.Println("Less then two arguments..")
 		os.Exit(1)
 	}
 
+	cmdName := os.Args[1]
+	cmdArgs := os.Args[2:]
+
 	command := Command{
-		Name: userInput[0],
-		Args: userInput[1:],
+		Name: cmdName,
+		Args: cmdArgs,
 	}
 
 	err := commands.run(state,command)
