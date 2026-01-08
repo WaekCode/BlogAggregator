@@ -45,7 +45,7 @@ func main() {
 	commands.register("users",HandlerUsers)
 	commands.register("agg",HandlerAgg)
 	commands.register("addfeed",HandlerAddFeed)
-
+	commands.register("feeds",HandlerFeeds)
 
 	if len(os.Args) < 2 {
 		fmt.Println("Less then two arguments..")

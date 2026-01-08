@@ -206,18 +206,14 @@ func HandlerAddFeed(s *State, cmd Command) error{
 								UpdatedAt: time.Now(),
 								Name: cmd.Args[0],
 								Url: cmd.Args[1],
-								UserID: user.ID,
-
-
-
-	})	
+								UserID: user.ID,})	
 
 	if err != nil{
 		return err
 	}
 
 	fmt.Println(feed)
-}
+	}
 
 	return  nil							
 
@@ -226,4 +222,23 @@ func HandlerAddFeed(s *State, cmd Command) error{
 
 
 
+func HandlerFeeds(s *State, cmd Command) error{
+	feeds,err := s.db.Listfeeds(context.Background())
+	if err != nil{
+		fmt.Println("Could not list feeds")
+		return err
+	}
 
+	if len(feeds) == 0{
+		fmt.Println("No feeds found")
+		return nil
+	}
+
+	for _,f := range feeds{
+		fmt.Println(f.Name)
+		fmt.Println(f.Url)
+		fmt.Println(f.UserName)
+	}
+
+	return nil
+}
