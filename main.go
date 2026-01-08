@@ -44,6 +44,7 @@ func main() {
 	commands.register("reset",HandlerReset)
 	commands.register("users",HandlerUsers)
 	commands.register("agg",HandlerAgg)
+	commands.register("addfeed",HandlerAddFeed)
 
 
 	if len(os.Args) < 2 {

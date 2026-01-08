@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 	"time"
+
 	"github.com/WaekCode/BlogAggregator/internal/config"
 	"github.com/WaekCode/BlogAggregator/internal/database"
 	"github.com/google/uuid"
+
 )
 
 
@@ -183,3 +185,45 @@ func HandlerAgg(s *State, cmd Command) error{
 	return nil
 
 }
+
+
+func HandlerAddFeed(s *State, cmd Command) error{
+	
+	if len(cmd.Args) < 2{
+		fmt.Println("no arg was passed")
+		os.Exit(1)
+	}
+	curUser := s.Config.CurrentUserName
+	if curUser == ""{
+		return fmt.Errorf("no user is logged in")
+	}else{
+	user,err := s.db.GetUserByName(context.Background(),curUser)
+
+	feed,err := s.db.CreateFeed(context.Background(),
+								database.CreateFeedParams{
+								ID: uuid.New(),
+								CreatedAt: time.Now(),
+								UpdatedAt: time.Now(),
+								Name: cmd.Args[0],
+								Url: cmd.Args[1],
+								UserID: user.ID,
+
+
+
+	})	
+
+	if err != nil{
+		return err
+	}
+
+	fmt.Println(feed)
+}
+
+	return  nil							
+
+}
+
+
+
+
+
