@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/WaekCode/BlogAggregator/internal/config"
@@ -45,23 +44,23 @@ func (c *Commands) run(s *State, cmd Command) error {
 		return  fmt.Errorf("Could not run this command")
 	}
 
-	fun(s,cmd)
+	err := fun(s,cmd)
 
-	return  nil
+	return  err
 
 }
 
 
 func HandlerLogin(s *State, cmd Command) error{
-	if len(cmd.Args) != 1{
-		fmt.Println("no arg was passed")
-		os.Exit(1)
+	if len(cmd.Args) < 1{
+		return fmt.Errorf("no arg was passed")
+	
 	}
 	
 	_, errs := s.db.GetUserByName(context.Background(), cmd.Args[0])
 	if errs != nil{
-		println("you cant login to a user that doesnt exists...")
-		os.Exit(1)
+		return fmt.Errorf("you cant login to a user that doesnt exists...")
+		
 	}
 
 
@@ -82,15 +81,14 @@ func HandlerLogin(s *State, cmd Command) error{
 
 
 func HandlerRegister(s *State, cmd Command) error{
-	if len(cmd.Args) != 1{
-		fmt.Println("no arg was passed")
-		os.Exit(1)
+	if len(cmd.Args) < 1{
+		return fmt.Errorf("no arg was passed")
 	}
 
 	_, errs := s.db.GetUserByName(context.Background(), cmd.Args[0])
 	if errs == nil{
-			fmt.Println("user with that name already exists")
-			os.Exit(1)
+			return fmt.Errorf("user with that name already exists")
+		
 	}
 	
 
@@ -131,8 +129,8 @@ func HandlerReset(s *State, cmd Command) error{
 	
 	err := s.db.ResetUsers(context.Background())
 	if err == nil{
-		fmt.Println("Users were deleted...")
-		return err
+		return fmt.Errorf("Users were deleted...")
+
 	}
 
 	fmt.Println("Users were Not deleted")
@@ -144,13 +142,12 @@ func HandlerReset(s *State, cmd Command) error{
 func HandlerUsers(s *State, cmd Command) error{
 	users,err := s.db.ListUsers(context.Background())
 	if err != nil{
-		fmt.Println("Could not list users")
-		return err
+		return fmt.Errorf("Could not list users")
 	}
 
 	if len(users) == 0{
-		fmt.Println("No users found")
-		return nil
+		return fmt.Errorf("No users found")
+		
 	}
 
 
@@ -190,8 +187,8 @@ func HandlerAgg(s *State, cmd Command) error{
 func HandlerAddFeed(s *State, cmd Command) error{
 	
 	if len(cmd.Args) < 2{
-		fmt.Println("no arg was passed")
-		os.Exit(1)
+		return fmt.Errorf("no arg was passed")
+	
 	}
 	curUser := s.Config.CurrentUserName
 	if curUser == ""{
@@ -225,13 +222,13 @@ func HandlerAddFeed(s *State, cmd Command) error{
 func HandlerFeeds(s *State, cmd Command) error{
 	feeds,err := s.db.Listfeeds(context.Background())
 	if err != nil{
-		fmt.Println("Could not list feeds")
-		return err
+		return fmt.Errorf("Could not list feeds")
+		
 	}
 
 	if len(feeds) == 0{
-		fmt.Println("No feeds found")
-		return nil
+		return fmt.Errorf("No feeds found")
+	
 	}
 
 	for _,f := range feeds{
