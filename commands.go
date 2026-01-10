@@ -184,21 +184,12 @@ func HandlerAgg(s *State, cmd Command) error{
 }
 
 
-func HandlerAddFeed(s *State, cmd Command) error{
+func HandlerAddFeed(s *State, cmd Command, user database.User) error{
 	
 	if len(cmd.Args) < 2{
 		return fmt.Errorf("no arg was passed")
 	
 	}
-	curUser := s.Config.CurrentUserName
-	if curUser == ""{
-		return fmt.Errorf("no user is logged in")
-	}else{
-	user,err1 := s.db.GetUserByName(context.Background(),curUser)
-	if err1 != nil{
-		return err1
-	}
-
 
 	feed,err2 := s.db.CreateFeed(context.Background(),
 								database.CreateFeedParams{
@@ -233,7 +224,7 @@ func HandlerAddFeed(s *State, cmd Command) error{
 
 	fmt.Println(feedfollows.FeedName)
 	fmt.Println(feedfollows.UserName)
-	}
+	
 
 	return  nil							
 
@@ -262,7 +253,7 @@ func HandlerFeeds(s *State, cmd Command) error{
 }
 
 
-func HandlerFollow(s *State, cmd Command) error{
+func HandlerFollow(s *State, cmd Command, user database.User) error{
 	if len(cmd.Args) < 1{
 		return fmt.Errorf("no arg was passed")
 	}
@@ -273,13 +264,6 @@ func HandlerFollow(s *State, cmd Command) error{
 		return err
 	}
 
-	user,err2 := s.db.GetUserByName(context.Background(),s.Config.CurrentUserName)
-
-	if err2 != nil{
-		return err2
-	}
-
-	
 	followerfeed,err3 := s.db.CreateFeedFollow(context.Background(),
 	database.CreateFeedFollowParams{
 							ID: uuid.New(),
@@ -306,13 +290,7 @@ func HandlerFollow(s *State, cmd Command) error{
 
 
 
-func HandlerFollowing(s *State, cmd Command) error{
-	user,err := s.db.GetUserByName(context.Background(),s.Config.CurrentUserName)
-	if err != nil{
-		return err
-	}
-
-
+func HandlerFollowing(s *State, cmd Command, user database.User) error{
 	feeds,err2 := s.db.GetFeedFollowsFromUser(context.Background(),user.ID)
 	if err2 != nil{
 		return err2
@@ -327,5 +305,26 @@ func HandlerFollowing(s *State, cmd Command) error{
 	}
 
 	return  nil
+
+}
+
+func middlewareLoggedIn(handler func(s *State, cmd Command, user database.User) error) func(*State, Command) error{
+	
+	return func(s *State, cmd Command) error{
+		if s.Config.CurrentUserName == ""{
+			return fmt.Errorf("No users are logged in...")
+		}
+		
+		
+		user,err := s.db.GetUserByName(context.Background(),s.Config.CurrentUserName)
+		if err != nil{
+			return err
+		}
+
+
+		return  handler(s,cmd,user)
+
+	} 	
+
 
 }

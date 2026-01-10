@@ -44,10 +44,10 @@ func main() {
 	commands.register("reset",HandlerReset)
 	commands.register("users",HandlerUsers)
 	commands.register("agg",HandlerAgg)
-	commands.register("addfeed",HandlerAddFeed)
+	commands.register("addfeed",middlewareLoggedIn(HandlerAddFeed))
 	commands.register("feeds",HandlerFeeds)
-	commands.register("follow",HandlerFollow)
-	commands.register("following",HandlerFollowing)
+	commands.register("follow",middlewareLoggedIn(HandlerFollow))
+	commands.register("following",middlewareLoggedIn(HandlerFollowing))
 
 	if len(os.Args) < 2 {
 		fmt.Println("Less then two arguments..")
