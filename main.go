@@ -48,6 +48,8 @@ func main() {
 	commands.register("feeds",HandlerFeeds)
 	commands.register("follow",middlewareLoggedIn(HandlerFollow))
 	commands.register("following",middlewareLoggedIn(HandlerFollowing))
+	commands.register("unfollow",middlewareLoggedIn(HandlerUnFollow))
+
 
 	if len(os.Args) < 2 {
 		fmt.Println("Less then two arguments..")

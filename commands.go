@@ -328,3 +328,28 @@ func middlewareLoggedIn(handler func(s *State, cmd Command, user database.User) 
 
 
 }
+
+
+func HandlerUnFollow(s *State, cmd Command, user database.User) error{
+	feed,err := s.db.GetFeedFromUrl(context.Background(),cmd.Args[0])
+	if err != nil{
+		return  err
+	}
+
+	err2 := s.db.UnfollowFeed(context.Background(),
+			database.UnfollowFeedParams{
+				UserID: user.ID,
+				FeedID: feed.ID,
+
+			})		
+
+	if err2 != nil{
+		return  err2
+	}
+
+
+	fmt.Println("Deleting...",feed.Name)
+
+	return nil
+
+}
