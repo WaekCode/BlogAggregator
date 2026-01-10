@@ -194,9 +194,13 @@ func HandlerAddFeed(s *State, cmd Command) error{
 	if curUser == ""{
 		return fmt.Errorf("no user is logged in")
 	}else{
-	user,err := s.db.GetUserByName(context.Background(),curUser)
+	user,err1 := s.db.GetUserByName(context.Background(),curUser)
+	if err1 != nil{
+		return err1
+	}
 
-	feed,err := s.db.CreateFeed(context.Background(),
+
+	feed,err2 := s.db.CreateFeed(context.Background(),
 								database.CreateFeedParams{
 								ID: uuid.New(),
 								CreatedAt: time.Now(),
@@ -205,18 +209,35 @@ func HandlerAddFeed(s *State, cmd Command) error{
 								Url: cmd.Args[1],
 								UserID: user.ID,})	
 
-	if err != nil{
-		return err
+				
+	if err2 != nil{
+		return err2
 	}
 
-	fmt.Println(feed)
+	feedfollows,err3 := s.db.CreateFeedFollow(context.Background(), 
+											  database.CreateFeedFollowParams{
+												ID: uuid.New(),
+												CreatedAt: time.Now(),
+												UpdatedAt: time.Now(),
+												UserID: user.ID,
+												FeedID: feed.ID,
+											  },
+
+
+	)
+
+	if err3 != nil{
+		return  err3
+	}
+
+
+	fmt.Println(feedfollows.FeedName)
+	fmt.Println(feedfollows.UserName)
 	}
 
 	return  nil							
 
 }
-
-
 
 
 func HandlerFeeds(s *State, cmd Command) error{
@@ -238,4 +259,73 @@ func HandlerFeeds(s *State, cmd Command) error{
 	}
 
 	return nil
+}
+
+
+func HandlerFollow(s *State, cmd Command) error{
+	if len(cmd.Args) < 1{
+		return fmt.Errorf("no arg was passed")
+	}
+
+	feed,err := s.db.GetFeedFromUrl(context.Background(),cmd.Args[0])
+
+	if err != nil{
+		return err
+	}
+
+	user,err2 := s.db.GetUserByName(context.Background(),s.Config.CurrentUserName)
+
+	if err2 != nil{
+		return err2
+	}
+
+	
+	followerfeed,err3 := s.db.CreateFeedFollow(context.Background(),
+	database.CreateFeedFollowParams{
+							ID: uuid.New(),
+							CreatedAt: time.Now(),
+							UpdatedAt: time.Now(),
+							UserID: user.ID,
+							FeedID: feed.ID,
+
+
+	},
+											
+	)
+
+
+	if err3 != nil{
+		return err3
+	}
+
+	fmt.Println(followerfeed.FeedName)
+	fmt.Println(followerfeed.UserName)
+
+	return nil
+}
+
+
+
+func HandlerFollowing(s *State, cmd Command) error{
+	user,err := s.db.GetUserByName(context.Background(),s.Config.CurrentUserName)
+	if err != nil{
+		return err
+	}
+
+
+	feeds,err2 := s.db.GetFeedFollowsFromUser(context.Background(),user.ID)
+	if err2 != nil{
+		return err2
+	}
+
+	if len(feeds) == 0{
+		return fmt.Errorf("Current user does not follow any feeds")
+	}
+
+	for _,f := range feeds{
+		fmt.Println(f.FeedName)
+	}
+
+	return  nil
+
 }
