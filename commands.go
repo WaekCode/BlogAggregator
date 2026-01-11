@@ -14,7 +14,6 @@ import (
 
 type State struct {
 	db  *database.Queries
-
     Config *config.Config
 }
 
@@ -171,15 +170,29 @@ func HandlerUsers(s *State, cmd Command) error{
 
 
 func HandlerAgg(s *State, cmd Command) error{
+	if len(cmd.Args) < 1{
+		return fmt.Errorf("no arg was passed")
+	}
+	time_between_reqs  := cmd.Args[0]
 
-	rss,err := fetchFeed(context.Background(),"https://www.wagslane.dev/index.xml")
+	timeBetweenRequests,err := time.ParseDuration(time_between_reqs)
 	if err != nil{
 		return  err
 	}
 
-	fmt.Println(rss)
+	fmt.Println("Collecting feeds every",timeBetweenRequests)
 	
-	return nil
+	ticker := time.NewTicker(timeBetweenRequests)
+	defer ticker.Stop()
+	scrapeFeeds(s) // run immediately
+	for range ticker.C {
+		err := scrapeFeeds(s)
+		if err != nil {
+			fmt.Println("Error scraping feeds:", err)
+		}
+	}
+	
+	return  nil
 
 }
 
@@ -314,8 +327,7 @@ func middlewareLoggedIn(handler func(s *State, cmd Command, user database.User) 
 		if s.Config.CurrentUserName == ""{
 			return fmt.Errorf("No users are logged in...")
 		}
-		
-		
+			
 		user,err := s.db.GetUserByName(context.Background(),s.Config.CurrentUserName)
 		if err != nil{
 			return err
