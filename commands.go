@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"strconv"
 
 	"github.com/WaekCode/BlogAggregator/internal/config"
 	"github.com/WaekCode/BlogAggregator/internal/database"
@@ -184,7 +185,10 @@ func HandlerAgg(s *State, cmd Command) error{
 	
 	ticker := time.NewTicker(timeBetweenRequests)
 	defer ticker.Stop()
-	scrapeFeeds(s) // run immediately
+	err1 := scrapeFeeds(s)// run immediately
+		if err1 != nil {
+			fmt.Println("Error scraping feeds:", err1)
+		} 
 	for range ticker.C {
 		err := scrapeFeeds(s)
 		if err != nil {
@@ -363,5 +367,41 @@ func HandlerUnFollow(s *State, cmd Command, user database.User) error{
 	fmt.Println("Deleting...",feed.Name)
 
 	return nil
+
+}
+
+func HandlerBrowse(s *State, cmd Command, user database.User) error{
+	var limit int32
+	if len(cmd.Args) < 1{
+		limit = 2
+	} else {
+		n, err := strconv.Atoi(cmd.Args[0])
+		if err != nil {
+			return fmt.Errorf("invalid limit: %w", err)
+		}
+		limit = int32(n)
+	}
+
+	posts,err := s.db.GetPostForUser(context.Background(),
+		database.GetPostForUserParams{
+			UserID: user.ID,
+			Limit: limit,
+		},
+	)
+	if err != nil{
+		return err
+	}
+
+	for _,p := range posts{
+		fmt.Println(p.Title)
+		fmt.Println(p.Url)
+		fmt.Println(p.Description)
+		fmt.Println(p.PublishedAt)
+		fmt.Println("-----")
+		fmt.Println()
+	}
+
+	return nil
+
 
 }

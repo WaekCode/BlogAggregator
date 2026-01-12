@@ -49,6 +49,7 @@ func main() {
 	commands.register("follow",middlewareLoggedIn(HandlerFollow))
 	commands.register("following",middlewareLoggedIn(HandlerFollowing))
 	commands.register("unfollow",middlewareLoggedIn(HandlerUnFollow))
+	commands.register("browse",middlewareLoggedIn(HandlerBrowse))
 	
 
 
