@@ -8,7 +8,7 @@ import (
 	// "fmt"
 	"time"
 
-	"github.com/WaekCode/BlogAggregator/internal/database"
+	"github.com/WaekCode/gator/internal/database"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 )

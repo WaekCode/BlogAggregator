@@ -17,7 +17,7 @@ Option A — install from the module with `go install` (recommended):
 
 ```bash
 # installs the main package binary into $GOBIN or $GOPATH/bin
-go install github.com/WaekCode/BlogAggregator@latest
+go install github.com/WaekCode/gator@latest
 ```
 
 Make sure your Go bin directory is on your PATH (for example: `export PATH="$PATH:$(go env GOPATH)/bin"`).
@@ -100,25 +100,3 @@ go run main.go commands
 - If you prefer, run `go run main.go <command>` while developing.
 
 ---
-
-## 📤 Pushing to GitHub
-
-1. Create a repository on GitHub (for example `gator`).
-2. Add a remote and push:
-
-```bash
-git remote add origin git@github.com:<your-username>/gator.git
-git push -u origin main
-```
-
-After you push the repository, your remote URL will look like:
-
-```
-https://github.com/<your-username>/gator
-```
-
-Please push the repo and share that URL so it can be reviewed.
-
----
-
-If you want, I can also help create a GitHub repo from here (you'll need to provide permissions or perform the final authorization), or I can provide the exact `git` commands to run — tell me how you'd like to proceed. ✅
